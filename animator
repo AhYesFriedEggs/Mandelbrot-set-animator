@@ -1,0 +1,52 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from numpy import newaxis
+import time
+import matplotlib.animation as animation
+
+
+start_time = time.time()
+
+
+def compute_mandelbrot(start_x, stop_x, start_y, stop_y, n_x):
+    N_max = 500
+    y = np.linspace(start_y, stop_y, 1000)
+    x = np.linspace(start_x, stop_x, n_x)
+
+    c = x[:, newaxis] + 1j * y[newaxis, :]
+
+    z = c
+
+    result = np.full(z.shape, N_max)
+    with np.warnings.catch_warnings():
+        np.warnings.simplefilter("ignore")
+        for j in range(N_max):
+            z = z ** 2 + c
+            result[z.real ** 2 >= 4] = j
+
+    return result
+
+
+p1, p2, p3, p4, p5 = -2.5, 1, -1, 1, 1750
+fig, ax = plt.subplots()
+ims = []
+l1 = np.linspace(0, 1.71518191, 3001)
+l2 = np.linspace(0, 1.78481789, 3001)
+l3 = np.linspace(0, 0.8533629772, 3001)
+l4 = np.linspace(0, 1.1466368228, 3001)
+for i in range(2999):
+    p1 += l1[1]
+    p2 -= l2[1]
+    p3 += l3[1]
+    p4 -= l4[1]
+    print(i)
+    im = ax.imshow(compute_mandelbrot(p1, p2, p3, p4, p5).T, cmap="plasma")
+    if i == 0:
+        ax.imshow(compute_mandelbrot(-2.5, 1, -1, 1, 1750).T, cmap="plasma")
+    ims.append([im])
+
+ani = animation.ArtistAnimation(fig, ims, interval=100, blit=True,
+                                repeat_delay=1000)
+ax.set_axis_off()
+print("--- %s seconds ---" % (time.time() - start_time))
+plt.show()
